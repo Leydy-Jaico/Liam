@@ -22,9 +22,7 @@
       --font-mono: 'Space Mono', monospace;
     }
 
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 
     body {
       background: var(--bg);
@@ -37,7 +35,6 @@
       overflow-x: hidden;
     }
 
-
     body::before {
       content: '';
       position: fixed;
@@ -48,7 +45,6 @@
       pointer-events: none;
       z-index: 0;
     }
-
 
     body::after {
       content: '';
@@ -62,7 +58,6 @@
       z-index: 0;
     }
 
-
     .wrapper {
       position: relative;
       z-index: 1;
@@ -71,7 +66,6 @@
       padding: 1.5rem 1rem 4rem;
     }
 
-
     header {
       display: flex;
       flex-direction: column;
@@ -79,7 +73,6 @@
       text-align: center;
       margin-bottom: 2rem;
     }
-
 
     .badge {
       font-family: var(--font-mono);
@@ -94,7 +87,6 @@
       text-transform: uppercase;
     }
 
-
     h1 {
       font-size: clamp(1.7rem, 6vw, 2.4rem);
       font-weight: 800;
@@ -102,12 +94,9 @@
       line-height: 1.1;
     }
 
-
     h1 em { font-style: normal; color: var(--accent); }
 
-
     .subtitle { margin-top: .5rem; color: var(--muted); font-size: .85rem; }
-
 
     .cam-card {
       background: var(--card);
@@ -117,7 +106,6 @@
       margin-bottom: 1rem;
       position: relative;
     }
-
 
     .cam-viewport {
       position: relative;
@@ -129,12 +117,10 @@
       justify-content: center;
     }
 
-
     #webcam-container {
       position: absolute;
       inset: 0;
     }
-
 
     #webcam-container canvas {
       width: 100% !important;
@@ -142,7 +128,6 @@
       object-fit: cover;
       display: block;
     }
-
 
     .bracket {
       position: absolute;
@@ -158,7 +143,6 @@
     .bracket.bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
     .bracket.br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
 
-
     .scan-line {
       position: absolute;
       left: 0; right: 0; height: 2px;
@@ -170,7 +154,6 @@
     }
     @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
 
-
     .placeholder-msg {
       display: flex;
       flex-direction: column;
@@ -179,7 +162,6 @@
       color: var(--muted);
       font-size: .85rem;
     }
-
 
     .cam-footer {
       padding: .85rem 1.2rem;
@@ -192,7 +174,6 @@
       color: var(--muted);
       letter-spacing: .05em;
     }
-
 
     .led {
       width: 8px; height: 8px;
@@ -208,13 +189,11 @@
     }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-
     .btn-row {
       display: flex;
       gap: .75rem;
       margin-bottom: 1rem;
     }
-
 
     button {
       flex: 1;
@@ -228,14 +207,12 @@
       transition: all .2s;
     }
 
-
     #btn-start {
       background: var(--accent);
       color: #fff;
     }
     #btn-start:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
     #btn-start:disabled { opacity: .35; cursor: not-allowed; }
-
 
     #btn-stop {
       background: transparent;
@@ -244,7 +221,6 @@
     }
     #btn-stop:hover:not(:disabled) { border-color: var(--muted); }
     #btn-stop:disabled { opacity: .25; cursor: not-allowed; }
-
 
     .upload-btn {
       width: 100%;
@@ -260,7 +236,6 @@
     .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
     #file-input { display: none; }
 
-
     #epp-panel {
       display: none;
       background: var(--card);
@@ -269,7 +244,6 @@
       padding: 1.25rem;
       margin-bottom: 1rem;
     }
-
 
     .panel-title {
       font-family: var(--font-mono);
@@ -280,14 +254,12 @@
       text-transform: uppercase;
     }
 
-
     .epp-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: .65rem;
       margin-bottom: 1.2rem;
     }
-
 
     .epp-chip {
       display: flex;
@@ -301,21 +273,17 @@
       transition: all .4s;
     }
 
-
     .epp-chip.ok {
       border-color: rgba(34,197,94,.4);
       background: rgba(34,197,94,.06);
     }
-
 
     .epp-chip.fail {
       border-color: rgba(239,68,68,.4);
       background: rgba(239,68,68,.06);
     }
 
-
     .epp-icon { font-size: 1.5rem; line-height: 1; }
-
 
     .epp-name {
       font-size: .68rem;
@@ -325,10 +293,8 @@
       transition: color .3s;
     }
 
-
     .epp-chip.ok .epp-name { color: var(--green); }
     .epp-chip.fail .epp-name { color: var(--red); }
-
 
     .epp-check {
       font-family: var(--font-mono);
@@ -338,9 +304,7 @@
     .epp-chip.ok .epp-check { color: var(--green); }
     .epp-chip.fail .epp-check { color: var(--red); }
 
-
     .raw-section { margin-top: .5rem; }
-
 
     .raw-title {
       font-family: var(--font-mono);
@@ -350,9 +314,7 @@
       margin-bottom: .6rem;
     }
 
-
     .bar-item { margin-bottom: .55rem; }
-
 
     .bar-row {
       display: flex;
@@ -361,10 +323,8 @@
       margin-bottom: .25rem;
     }
 
-
     .bar-label { font-size: .75rem; font-weight: 500; text-transform: capitalize; }
     .bar-pct { font-family: var(--font-mono); font-size: .7rem; color: var(--accent); }
-
 
     .bar-track {
       height: 3px;
@@ -373,14 +333,12 @@
       overflow: hidden;
     }
 
-
     .bar-fill {
       height: 100%;
       border-radius: 3px;
       background: linear-gradient(90deg, #3b82f6, #22c55e);
       transition: width .3s ease;
     }
-
 
     /* ── VERDICT OVERLAY ── */
     #verdict {
@@ -395,9 +353,7 @@
       background: rgba(6,8,16,.5);
     }
 
-
     #verdict.show { display: flex; }
-
 
     .verdict-box {
       position: relative;
@@ -409,12 +365,10 @@
       animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
     }
 
-
     @keyframes popIn {
       from { transform: scale(.7); opacity: 0; }
       to   { transform: scale(1);  opacity: 1; }
     }
-
 
     .verdict-box.safe {
       background: linear-gradient(135deg, #0d1f14, #0f2419);
@@ -422,13 +376,11 @@
       box-shadow: 0 0 80px rgba(34,197,94,.18);
     }
 
-
     .verdict-box.danger {
       background: linear-gradient(135deg, #1f0d0d, #240f0f);
       border: 1px solid rgba(239,68,68,.5);
       box-shadow: 0 0 80px rgba(239,68,68,.22);
     }
-
 
     .verdict-icon {
       font-size: 3.5rem;
@@ -438,12 +390,10 @@
       animation: iconBounce .5s .2s cubic-bezier(.34,1.56,.64,1) both;
     }
 
-
     @keyframes iconBounce {
       from { transform: scale(0) rotate(-20deg); }
       to   { transform: scale(1) rotate(0deg); }
     }
-
 
     .verdict-title {
       font-size: 1.45rem;
@@ -452,10 +402,8 @@
       margin-bottom: .5rem;
     }
 
-
     .verdict-box.safe .verdict-title { color: var(--green); }
     .verdict-box.danger .verdict-title { color: var(--red); }
-
 
     .verdict-msg {
       font-size: .88rem;
@@ -464,7 +412,6 @@
       margin-bottom: 1.25rem;
     }
 
-
     .verdict-missing {
       display: flex;
       gap: .5rem;
@@ -472,7 +419,6 @@
       justify-content: center;
       margin-bottom: 1.25rem;
     }
-
 
     .missing-tag {
       background: rgba(239,68,68,.12);
@@ -483,7 +429,6 @@
       padding: .3rem .75rem;
       border-radius: 999px;
     }
-
 
     .verdict-close {
       background: rgba(255,255,255,.07);
@@ -500,9 +445,7 @@
       display: inline-block;
     }
 
-
     .verdict-close:hover { background: rgba(255,255,255,.12); }
-
 
     .pulse-ring {
       display: none;
@@ -514,15 +457,12 @@
       pointer-events: none;
     }
 
-
     .verdict-box.danger .pulse-ring { display: block; }
-
 
     @keyframes ringPulse {
       0%,100% { opacity: 1; transform: scale(1); }
       50%      { opacity: 0; transform: scale(1.04); }
     }
-
 
     footer {
       text-align: center;
@@ -533,12 +473,10 @@
       letter-spacing: .08em;
     }
 
-
     footer span { color: var(--accent); }
   </style>
 </head>
 <body>
-
 
 <!-- VERDICT OVERLAY -->
 <div id="verdict">
@@ -552,14 +490,12 @@
   </div>
 </div>
 
-
 <div class="wrapper">
   <header>
     <div class="badge">⚙ SISTEMA DE CONTROL EPP</div>
     <h1>Verificación de <em>Equipo<br>de Protección</em></h1>
     <p class="subtitle">Detección automática en tiempo real</p>
   </header>
-
 
   <div class="cam-card">
     <div class="cam-viewport">
@@ -583,22 +519,18 @@
     </div>
   </div>
 
-
   <div class="btn-row">
     <button id="btn-start" onclick="startWebcam()">▶ Iniciar Cámara</button>
     <button id="btn-stop"  onclick="stopWebcam()" disabled>■ Detener</button>
   </div>
-
 
   <button class="upload-btn" onclick="document.getElementById('file-input').click()">
     📂 &nbsp;Subir imagen para verificar
   </button>
   <input type="file" id="file-input" accept="image/*" onchange="classifyImage(this)" />
 
-
   <div id="epp-panel">
     <div class="panel-title">Estado del equipo de protección</div>
-
 
     <div class="epp-grid">
       <div class="epp-chip" id="chip-lentes">
@@ -618,21 +550,17 @@
       </div>
     </div>
 
-
     <div class="raw-section">
       <div class="raw-title">PREDICCIONES DEL MODELO</div>
       <div id="bars-container"></div>
     </div>
   </div>
 
-
   <footer>Hecho por <span>Liam</span> · EPP Control System</footer>
 </div>
 
-
 <script>
   const MODEL_URL = 'https://teachablemachine.withgoogle.com/models/vlGc_6c1p/';
-
 
   /*
    * MAPEO DE CLASES → EPP
@@ -646,14 +574,16 @@
     guantes:    ['guante', 'glove'],
   };
 
-
   const NEGATIVE_WORDS = ['sin ', 'no ', 'sin_', 'error', 'incorrecto', 'falta', 'ausente'];
   const ALL_OK_WORDS   = ['completo', 'correcto', 'protegido', 'todos'];
 
+  const SCAN_DURATION = 10; // segundos de escaneo antes del veredicto
 
   let model, webcam, running = false;
   let verdictCooldown = false;
-
+  let scanCountdown = null;   // intervalo activo
+  let scanSecondsLeft = 0;
+  let pendingEpp = null;      // último EPP capturado durante el escaneo
 
   // ─── Load model ───────────────────────────────────
   async function loadModel() {
@@ -664,16 +594,13 @@
     setStatus('Modelo listo ✓');
   }
 
-
   // ─── Webcam ───────────────────────────────────────
   async function startWebcam() {
     document.getElementById('btn-start').disabled = true;
     if (!model) await loadModel();
 
-
     document.getElementById('placeholder').style.display = 'none';
     setStatus('Iniciando cámara…');
-
 
     webcam = new tmImage.Webcam(224, 224, true);
     try {
@@ -683,7 +610,6 @@
     }
     await webcam.play();
 
-
     document.getElementById('webcam-container').appendChild(webcam.canvas);
     document.getElementById('scan-line').style.display = 'block';
     document.getElementById('led').classList.add('on');
@@ -691,11 +617,9 @@
     document.getElementById('epp-panel').style.display = 'block';
     setStatus('Escaneando en tiempo real…');
 
-
     running = true;
     loop();
   }
-
 
   async function loop() {
     if (!running) return;
@@ -704,10 +628,11 @@
     requestAnimationFrame(loop);
   }
 
-
   function stopWebcam() {
     running = false;
     if (webcam) webcam.stop();
+    if (scanCountdown) { clearInterval(scanCountdown); scanCountdown = null; }
+    verdictCooldown = false;
     document.getElementById('webcam-container').innerHTML = '';
     document.getElementById('placeholder').style.display = 'flex';
     document.getElementById('scan-line').style.display = 'none';
@@ -716,7 +641,6 @@
     document.getElementById('btn-stop').disabled = true;
     setStatus('Cámara detenida');
   }
-
 
   // ─── Image upload ─────────────────────────────────
   async function classifyImage(input) {
@@ -734,52 +658,40 @@
     input.value = '';
   }
 
-
   // ─── Core prediction ──────────────────────────────
   async function predict(source) {
     const preds = await model.predict(source);
     const sorted = [...preds].sort((a, b) => b.probability - a.probability);
 
-
     renderBars(sorted);
-
 
     const epp = detectEPP(preds);
     updateChip('lentes',     epp.lentes);
     updateChip('mascarilla', epp.mascarilla);
     updateChip('guantes',    epp.guantes);
 
-
-    // Mostrar veredicto cuando haya confianza alta (>65%)
+    // Mostrar veredicto solo después de SCAN_DURATION segundos de escaneo
     const topConf = sorted[0].probability;
     if (topConf > 0.65 && !verdictCooldown) {
-      showVerdict(epp);
-      verdictCooldown = true;
-      // En tiempo real esperamos 6s antes del siguiente veredicto
-      setTimeout(() => { verdictCooldown = false; }, running ? 6000 : 9999999);
+      triggerScanCountdown(epp);
     }
   }
-
 
   // ─── EPP detection logic ──────────────────────────
   function detectEPP(preds) {
     const THRESHOLD = 0.30;
     const result = { lentes: false, mascarilla: false, guantes: false };
 
-
     // Clases activas (por encima del umbral) + siempre incluir la top
     const sorted = [...preds].sort((a, b) => b.probability - a.probability);
     const active = preds.filter(p => p.probability >= THRESHOLD);
     const consider = active.length ? active : [sorted[0]];
 
-
     consider.forEach(p => {
       const n = p.className.toLowerCase().trim();
 
-
       const isNeg  = NEGATIVE_WORDS.some(w => n.includes(w));
       const isAllOk = ALL_OK_WORDS.some(w => n.includes(w));
-
 
       if (isAllOk && !isNeg) {
         result.lentes = true;
@@ -788,23 +700,18 @@
         return;
       }
 
-
       if (KEYWORDS.lentes.some(k => n.includes(k)))
         result.lentes = !isNeg;
 
-
       if (KEYWORDS.mascarilla.some(k => n.includes(k)))
         result.mascarilla = !isNeg;
-
 
       if (KEYWORDS.guantes.some(k => n.includes(k)))
         result.guantes = !isNeg;
     });
 
-
     return result;
   }
-
 
   // ─── UI helpers ───────────────────────────────────
   function updateChip(id, isOk) {
@@ -813,7 +720,6 @@
     chip.classList.add(isOk ? 'ok' : 'fail');
     chip.querySelector('.epp-check').textContent = isOk ? '✓' : '✗';
   }
-
 
   function renderBars(sorted) {
     document.getElementById('bars-container').innerHTML = sorted.map(p => {
@@ -831,11 +737,34 @@
     }).join('');
   }
 
+  // ─── Scan countdown ───────────────────────────────
+  function triggerScanCountdown(epp) {
+    // Si ya hay un conteo activo, solo actualizar el epp pendiente
+    pendingEpp = epp;
+    if (scanCountdown !== null) return;
+
+    verdictCooldown = true;
+    scanSecondsLeft = SCAN_DURATION;
+    setStatus(`Analizando… ${scanSecondsLeft}s`);
+
+    scanCountdown = setInterval(() => {
+      scanSecondsLeft--;
+      if (scanSecondsLeft > 0) {
+        setStatus(`Analizando… ${scanSecondsLeft}s`);
+      } else {
+        clearInterval(scanCountdown);
+        scanCountdown = null;
+        setStatus('Escaneando en tiempo real…');
+        showVerdict(pendingEpp);
+        // Cooldown tras el veredicto: 8s antes de permitir otro escaneo
+        setTimeout(() => { verdictCooldown = false; }, 8000);
+      }
+    }, 1000);
+  }
 
   // ─── Verdict overlay ──────────────────────────────
   function showVerdict(epp) {
     const allOk = epp.lentes && epp.mascarilla && epp.guantes;
-
 
     const box     = document.getElementById('verdict-box');
     const icon    = document.getElementById('verdict-icon');
@@ -843,9 +772,7 @@
     const msg     = document.getElementById('verdict-msg');
     const missing = document.getElementById('verdict-missing');
 
-
     box.className = 'verdict-box ' + (allOk ? 'safe' : 'danger');
-
 
     if (allOk) {
       icon.textContent  = '✅';
@@ -858,27 +785,22 @@
       if (!epp.mascarilla) items.push('😷 Mascarilla');
       if (!epp.guantes)    items.push('🧤 Guantes');
 
-
       icon.textContent  = '🚫';
       title.textContent = '¡No puedes salir!';
       msg.textContent   = 'Faltan elementos de protección obligatorios. Completa tu equipo antes de continuar.';
       missing.innerHTML = items.map(i => `<span class="missing-tag">${i}</span>`).join('');
     }
 
-
     document.getElementById('verdict').classList.add('show');
   }
-
 
   function closeVerdict() {
     document.getElementById('verdict').classList.remove('show');
   }
 
-
   function setStatus(msg) {
     document.getElementById('status-text').textContent = msg;
   }
-
 
   // Precargar modelo al abrir la app
   window.addEventListener('load', () => {
@@ -887,4 +809,3 @@
 </script>
 </body>
 </html>
-
