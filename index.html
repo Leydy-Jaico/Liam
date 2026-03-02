@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control EPP — Liam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Sora:wght@300;500;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+  <style>
+    :root {
+      --bg: #060810;
+      --surface: #0d0f1a;
+      --card: #111320;
+      --border: #1c1f33;
+      --accent: #3b82f6;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #e2e8f0;
+      --muted: #4a5280;
+      --font-display: 'Sora', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-display);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(59,130,246,.07) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 35% at 80% 90%, rgba(34,197,94,.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+
+    .badge {
+      font-family: var(--font-mono);
+      font-size: .6rem;
+      letter-spacing: .18em;
+      color: var(--accent);
+      border: 1px solid rgba(59,130,246,.3);
+      background: rgba(59,130,246,.07);
+      padding: .3rem .8rem;
+      border-radius: 2px;
+      margin-bottom: .9rem;
+      text-transform: uppercase;
+    }
+
+
+    h1 {
+      font-size: clamp(1.7rem, 6vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+    }
+
+
+    h1 em { font-style: normal; color: var(--accent); }
+
+
+    .subtitle { margin-top: .5rem; color: var(--muted); font-size: .85rem; }
+
+
+    .cam-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+
+    .cam-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+    #webcam-container {
+      position: absolute;
+      inset: 0;
+    }
+
+
+    #webcam-container canvas {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover;
+      display: block;
+    }
+
+
+    .bracket {
+      position: absolute;
+      width: 24px; height: 24px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: .5;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .bracket.tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+    .bracket.tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+    .bracket.bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+    .bracket.br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+
+    .scan-line {
+      position: absolute;
+      left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      animation: scanMove 2.5s linear infinite;
+      display: none;
+      z-index: 2;
+      pointer-events: none;
+    }
+    @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
+
+
+    .placeholder-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .6rem;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+
+    .cam-footer {
+      padding: .85rem 1.2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--font-mono);
+      font-size: .65rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+
+
+    .led {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .led.on {
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: blink 1.5s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+
+    .btn-row {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+
+
+    button {
+      flex: 1;
+      padding: .85rem;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-display);
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+
+    #btn-start {
+      background: var(--accent);
+      color: #fff;
+    }
+    #btn-start:hover:not(:disabled) { filter: brightness(1.15); transform: translateY(-1px); }
+    #btn-start:disabled { opacity: .35; cursor: not-allowed; }
+
+
+    #btn-stop {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    #btn-stop:hover:not(:disabled) { border-color: var(--muted); }
+    #btn-stop:disabled { opacity: .25; cursor: not-allowed; }
+
+
+    .upload-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed rgba(59,130,246,.3);
+      color: var(--muted);
+      padding: .75rem;
+      border-radius: 12px;
+      font-size: .85rem;
+      margin-bottom: 1.25rem;
+      transition: all .2s;
+    }
+    .upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+    #file-input { display: none; }
+
+
+    #epp-panel {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      letter-spacing: .14em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+
+    .epp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: .65rem;
+      margin-bottom: 1.2rem;
+    }
+
+
+    .epp-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: .75rem .5rem;
+      transition: all .4s;
+    }
+
+
+    .epp-chip.ok {
+      border-color: rgba(34,197,94,.4);
+      background: rgba(34,197,94,.06);
+    }
+
+
+    .epp-chip.fail {
+      border-color: rgba(239,68,68,.4);
+      background: rgba(239,68,68,.06);
+    }
+
+
+    .epp-icon { font-size: 1.5rem; line-height: 1; }
+
+
+    .epp-name {
+      font-size: .68rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      color: var(--muted);
+      transition: color .3s;
+    }
+
+
+    .epp-chip.ok .epp-name { color: var(--green); }
+    .epp-chip.fail .epp-name { color: var(--red); }
+
+
+    .epp-check {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .epp-chip.ok .epp-check { color: var(--green); }
+    .epp-chip.fail .epp-check { color: var(--red); }
+
+
+    .raw-section { margin-top: .5rem; }
+
+
+    .raw-title {
+      font-family: var(--font-mono);
+      font-size: .58rem;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .6rem;
+    }
+
+
+    .bar-item { margin-bottom: .55rem; }
+
+
+    .bar-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .25rem;
+    }
+
+
+    .bar-label { font-size: .75rem; font-weight: 500; text-transform: capitalize; }
+    .bar-pct { font-family: var(--font-mono); font-size: .7rem; color: var(--accent); }
+
+
+    .bar-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #3b82f6, #22c55e);
+      transition: width .3s ease;
+    }
+
+
+    /* ── VERDICT OVERLAY ── */
+    #verdict {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      backdrop-filter: blur(6px);
+      background: rgba(6,8,16,.5);
+    }
+
+
+    #verdict.show { display: flex; }
+
+
+    .verdict-box {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+
+    @keyframes popIn {
+      from { transform: scale(.7); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+
+
+    .verdict-box.safe {
+      background: linear-gradient(135deg, #0d1f14, #0f2419);
+      border: 1px solid rgba(34,197,94,.4);
+      box-shadow: 0 0 80px rgba(34,197,94,.18);
+    }
+
+
+    .verdict-box.danger {
+      background: linear-gradient(135deg, #1f0d0d, #240f0f);
+      border: 1px solid rgba(239,68,68,.5);
+      box-shadow: 0 0 80px rgba(239,68,68,.22);
+    }
+
+
+    .verdict-icon {
+      font-size: 3.5rem;
+      line-height: 1;
+      margin-bottom: 1rem;
+      display: block;
+      animation: iconBounce .5s .2s cubic-bezier(.34,1.56,.64,1) both;
+    }
+
+
+    @keyframes iconBounce {
+      from { transform: scale(0) rotate(-20deg); }
+      to   { transform: scale(1) rotate(0deg); }
+    }
+
+
+    .verdict-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .5rem;
+    }
+
+
+    .verdict-box.safe .verdict-title { color: var(--green); }
+    .verdict-box.danger .verdict-title { color: var(--red); }
+
+
+    .verdict-msg {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+
+    .verdict-missing {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+
+
+    .missing-tag {
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #f87171;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .3rem .75rem;
+      border-radius: 999px;
+    }
+
+
+    .verdict-close {
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.1);
+      padding: .7rem 1.5rem;
+      border-radius: 10px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      flex: unset;
+      width: auto;
+      display: inline-block;
+    }
+
+
+    .verdict-close:hover { background: rgba(255,255,255,.12); }
+
+
+    .pulse-ring {
+      display: none;
+      position: absolute;
+      inset: -10px;
+      border-radius: 30px;
+      border: 2px solid rgba(239,68,68,.4);
+      animation: ringPulse 1.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+
+    .verdict-box.danger .pulse-ring { display: block; }
+
+
+    @keyframes ringPulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0; transform: scale(1.04); }
+    }
+
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-family: var(--font-mono);
+      font-size: .62rem;
+      color: var(--muted);
+      letter-spacing: .08em;
+    }
+
+
+    footer span { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+
+<!-- VERDICT OVERLAY -->
+<div id="verdict">
+  <div class="verdict-box" id="verdict-box">
+    <div class="pulse-ring"></div>
+    <span class="verdict-icon" id="verdict-icon"></span>
+    <div class="verdict-title" id="verdict-title"></div>
+    <div class="verdict-msg" id="verdict-msg"></div>
+    <div class="verdict-missing" id="verdict-missing"></div>
+    <button class="verdict-close" onclick="closeVerdict()">Volver a verificar</button>
+  </div>
+</div>
+
+
+<div class="wrapper">
+  <header>
+    <div class="badge">⚙ SISTEMA DE CONTROL EPP</div>
+    <h1>Verificación de <em>Equipo<br>de Protección</em></h1>
+    <p class="subtitle">Detección automática en tiempo real</p>
+  </header>
+
+
+  <div class="cam-card">
+    <div class="cam-viewport">
+      <div class="bracket tl"></div>
+      <div class="bracket tr"></div>
+      <div class="bracket bl"></div>
+      <div class="bracket br"></div>
+      <div class="placeholder-msg" id="placeholder">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#4a5280" stroke-width="1.3">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+        <span>Cámara desactivada</span>
+      </div>
+      <div id="webcam-container"></div>
+      <div class="scan-line" id="scan-line"></div>
+    </div>
+    <div class="cam-footer">
+      <div class="led" id="led"></div>
+      <span id="status-text">Listo — presiona Iniciar</span>
+    </div>
+  </div>
+
+
+  <div class="btn-row">
+    <button id="btn-start" onclick="startWebcam()">▶ Iniciar Cámara</button>
+    <button id="btn-stop"  onclick="stopWebcam()" disabled>■ Detener</button>
+  </div>
+
+
+  <button class="upload-btn" onclick="document.getElementById('file-input').click()">
+    📂 &nbsp;Subir imagen para verificar
+  </button>
+  <input type="file" id="file-input" accept="image/*" onchange="classifyImage(this)" />
+
+
+  <div id="epp-panel">
+    <div class="panel-title">Estado del equipo de protección</div>
+
+
+    <div class="epp-grid">
+      <div class="epp-chip" id="chip-lentes">
+        <div class="epp-icon">🥽</div>
+        <div class="epp-name">Lentes</div>
+        <div class="epp-check">—</div>
+      </div>
+      <div class="epp-chip" id="chip-mascarilla">
+        <div class="epp-icon">😷</div>
+        <div class="epp-name">Mascarilla</div>
+        <div class="epp-check">—</div>
+      </div>
+      <div class="epp-chip" id="chip-guantes">
+        <div class="epp-icon">🧤</div>
+        <div class="epp-name">Guantes</div>
+        <div class="epp-check">—</div>
+      </div>
+    </div>
+
+
+    <div class="raw-section">
+      <div class="raw-title">PREDICCIONES DEL MODELO</div>
+      <div id="bars-container"></div>
+    </div>
+  </div>
+
+
+  <footer>Hecho por <span>Liam</span> · EPP Control System</footer>
+</div>
+
+
+<script>
+  const MODEL_URL = 'https://teachablemachine.withgoogle.com/models/vlGc_6c1p/';
+
+
+  /*
+   * MAPEO DE CLASES → EPP
+   * Edita estas listas si los nombres exactos de tus clases son diferentes.
+   * La lógica: si el nombre de clase CONTIENE alguna keyword Y NO contiene
+   * palabras negativas → el EPP está presente.
+   */
+  const KEYWORDS = {
+    lentes:     ['lente', 'gafa', 'goggle', 'glass'],
+    mascarilla: ['mascari', 'mask', 'cubreboca'],
+    guantes:    ['guante', 'glove'],
+  };
+
+
+  const NEGATIVE_WORDS = ['sin ', 'no ', 'sin_', 'error', 'incorrecto', 'falta', 'ausente'];
+  const ALL_OK_WORDS   = ['completo', 'correcto', 'protegido', 'todos'];
+
+
+  let model, webcam, running = false;
+  let verdictCooldown = false;
+
+
+  // ─── Load model ───────────────────────────────────
+  async function loadModel() {
+    setStatus('Cargando modelo de IA…');
+    model = await tmImage.load(MODEL_URL + 'model.json', MODEL_URL + 'metadata.json');
+    const classes = model.getClassLabels();
+    console.log('[EPP] Clases detectadas en el modelo:', classes);
+    setStatus('Modelo listo ✓');
+  }
+
+
+  // ─── Webcam ───────────────────────────────────────
+  async function startWebcam() {
+    document.getElementById('btn-start').disabled = true;
+    if (!model) await loadModel();
+
+
+    document.getElementById('placeholder').style.display = 'none';
+    setStatus('Iniciando cámara…');
+
+
+    webcam = new tmImage.Webcam(224, 224, true);
+    try {
+      await webcam.setup({ facingMode: 'environment' });
+    } catch {
+      await webcam.setup({ facingMode: 'user' });
+    }
+    await webcam.play();
+
+
+    document.getElementById('webcam-container').appendChild(webcam.canvas);
+    document.getElementById('scan-line').style.display = 'block';
+    document.getElementById('led').classList.add('on');
+    document.getElementById('btn-stop').disabled = false;
+    document.getElementById('epp-panel').style.display = 'block';
+    setStatus('Escaneando en tiempo real…');
+
+
+    running = true;
+    loop();
+  }
+
+
+  async function loop() {
+    if (!running) return;
+    webcam.update();
+    await predict(webcam.canvas);
+    requestAnimationFrame(loop);
+  }
+
+
+  function stopWebcam() {
+    running = false;
+    if (webcam) webcam.stop();
+    document.getElementById('webcam-container').innerHTML = '';
+    document.getElementById('placeholder').style.display = 'flex';
+    document.getElementById('scan-line').style.display = 'none';
+    document.getElementById('led').classList.remove('on');
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-stop').disabled = true;
+    setStatus('Cámara detenida');
+  }
+
+
+  // ─── Image upload ─────────────────────────────────
+  async function classifyImage(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (!model) await loadModel();
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = async () => {
+      document.getElementById('epp-panel').style.display = 'block';
+      setStatus('Analizando imagen…');
+      await predict(img);
+      setStatus('Imagen analizada ✓');
+    };
+    input.value = '';
+  }
+
+
+  // ─── Core prediction ──────────────────────────────
+  async function predict(source) {
+    const preds = await model.predict(source);
+    const sorted = [...preds].sort((a, b) => b.probability - a.probability);
+
+
+    renderBars(sorted);
+
+
+    const epp = detectEPP(preds);
+    updateChip('lentes',     epp.lentes);
+    updateChip('mascarilla', epp.mascarilla);
+    updateChip('guantes',    epp.guantes);
+
+
+    // Mostrar veredicto cuando haya confianza alta (>65%)
+    const topConf = sorted[0].probability;
+    if (topConf > 0.65 && !verdictCooldown) {
+      showVerdict(epp);
+      verdictCooldown = true;
+      // En tiempo real esperamos 6s antes del siguiente veredicto
+      setTimeout(() => { verdictCooldown = false; }, running ? 6000 : 9999999);
+    }
+  }
+
+
+  // ─── EPP detection logic ──────────────────────────
+  function detectEPP(preds) {
+    const THRESHOLD = 0.30;
+    const result = { lentes: false, mascarilla: false, guantes: false };
+
+
+    // Clases activas (por encima del umbral) + siempre incluir la top
+    const sorted = [...preds].sort((a, b) => b.probability - a.probability);
+    const active = preds.filter(p => p.probability >= THRESHOLD);
+    const consider = active.length ? active : [sorted[0]];
+
+
+    consider.forEach(p => {
+      const n = p.className.toLowerCase().trim();
+
+
+      const isNeg  = NEGATIVE_WORDS.some(w => n.includes(w));
+      const isAllOk = ALL_OK_WORDS.some(w => n.includes(w));
+
+
+      if (isAllOk && !isNeg) {
+        result.lentes = true;
+        result.mascarilla = true;
+        result.guantes = true;
+        return;
+      }
+
+
+      if (KEYWORDS.lentes.some(k => n.includes(k)))
+        result.lentes = !isNeg;
+
+
+      if (KEYWORDS.mascarilla.some(k => n.includes(k)))
+        result.mascarilla = !isNeg;
+
+
+      if (KEYWORDS.guantes.some(k => n.includes(k)))
+        result.guantes = !isNeg;
+    });
+
+
+    return result;
+  }
+
+
+  // ─── UI helpers ───────────────────────────────────
+  function updateChip(id, isOk) {
+    const chip = document.getElementById('chip-' + id);
+    chip.classList.remove('ok', 'fail');
+    chip.classList.add(isOk ? 'ok' : 'fail');
+    chip.querySelector('.epp-check').textContent = isOk ? '✓' : '✗';
+  }
+
+
+  function renderBars(sorted) {
+    document.getElementById('bars-container').innerHTML = sorted.map(p => {
+      const pct = (p.probability * 100).toFixed(1);
+      return `
+        <div class="bar-item">
+          <div class="bar-row">
+            <span class="bar-label">${p.className}</span>
+            <span class="bar-pct">${pct}%</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+
+  // ─── Verdict overlay ──────────────────────────────
+  function showVerdict(epp) {
+    const allOk = epp.lentes && epp.mascarilla && epp.guantes;
+
+
+    const box     = document.getElementById('verdict-box');
+    const icon    = document.getElementById('verdict-icon');
+    const title   = document.getElementById('verdict-title');
+    const msg     = document.getElementById('verdict-msg');
+    const missing = document.getElementById('verdict-missing');
+
+
+    box.className = 'verdict-box ' + (allOk ? 'safe' : 'danger');
+
+
+    if (allOk) {
+      icon.textContent  = '✅';
+      title.textContent = '¡Estás protegido correctamente!';
+      msg.textContent   = 'Se detectaron lentes, mascarilla y guantes. Puedes proceder con seguridad.';
+      missing.innerHTML = '';
+    } else {
+      const items = [];
+      if (!epp.lentes)     items.push('🥽 Lentes');
+      if (!epp.mascarilla) items.push('😷 Mascarilla');
+      if (!epp.guantes)    items.push('🧤 Guantes');
+
+
+      icon.textContent  = '🚫';
+      title.textContent = '¡No puedes salir!';
+      msg.textContent   = 'Faltan elementos de protección obligatorios. Completa tu equipo antes de continuar.';
+      missing.innerHTML = items.map(i => `<span class="missing-tag">${i}</span>`).join('');
+    }
+
+
+    document.getElementById('verdict').classList.add('show');
+  }
+
+
+  function closeVerdict() {
+    document.getElementById('verdict').classList.remove('show');
+  }
+
+
+  function setStatus(msg) {
+    document.getElementById('status-text').textContent = msg;
+  }
+
+
+  // Precargar modelo al abrir la app
+  window.addEventListener('load', () => {
+    loadModel().catch(() => setStatus('Error al cargar — verifica tu conexión'));
+  });
+</script>
+</body>
+</html>
+
